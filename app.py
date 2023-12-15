@@ -19,6 +19,8 @@ static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
 line_bot_api = LineBotApi(os.getenv('CHANNEL_ACCESS_TOKEN'))
 # Channel Secret
 handler = WebhookHandler(os.getenv('CHANNEL_SECRET'))
+# OPENAI API Key初始化設定
+openai.api_key = os.getenv('OPENAI_API_KEY')
 
 def process_message(text):
     # 添加自定义条件，当用户输入"123"时，返回"321"
@@ -26,7 +28,16 @@ def process_message(text):
         return "321"
     else:
         # 在这里可以添加其他处理逻辑，例如调用GPT-3等
-        return "机器人：我听不懂你在说什么！"
+        GPT_answer = GPT_response(text)
+        return GPT_answer
+
+def GPT_response(text):
+    # 接收回應
+    response = openai.Completion.create(model="text-davinci-003", prompt=text, temperature=0.5, max_tokens=500)
+    print(response)
+    # 重組回應
+    answer = response['choices'][0]['text'].replace('。','')
+    return answer
 
 # 監聽所有來自 /callback 的 Post Request
 @app.route("/callback", methods=['POST'])
