@@ -6,6 +6,7 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 
+from google_images_search import GoogleImagesSearch
 from linebot.models import *
 
 from mongodb_function import *
@@ -15,6 +16,7 @@ import datetime
 import time
 import traceback
 import json
+import random
 
 app = Flask(__name__)
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
@@ -50,8 +52,26 @@ def process_message(text):
         msg = '已刪除成功'
     else:
         # 在这里可以添加其他处理逻辑，例如调用GPT-3等
-        msg = str('openAI目前尚未導入，目前以模仿代替\n您說的話是不是\n' + text)
+        msg = str('嗚呼呼\n人家聽不懂內owo')
     return msg
+
+def search_google_images(query):
+    gis = GoogleImagesSearch('your_google_api_key', 'your_google_cx')
+    _search_params = {
+        'q': query,
+        'num': 10,
+        'safe': 'high',
+        'fileType': 'jpg',
+    }
+
+    gis.search(search_params=_search_params)
+    images = gis.results()
+    return images
+
+def get_random_image_url(images):
+    if images:
+        return random.choice(images).url
+    return None
 
 # 監聽所有來自 /callback 的 Post Request
 @app.route("/callback", methods=['POST'])
@@ -78,8 +98,22 @@ def callback():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     user_message = event.message.text
-    reply_message = process_message(user_message)
-    line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_message))
+    if user_message == '來跟無月醬玩遊戲':
+        query = '蔚藍檔案 無月'
+        images = search_google_images(query)
+        image_url = get_random_image_url(images)
+
+        if image_url:
+            image_message = ImageSendMessage(
+                original_content_url=image_url,
+                preview_image_url=image_url
+            )
+            line_bot_api.reply_message(event.reply_token, image_message)
+        else:
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='找不到符合條件的圖片'))
+    else:
+        reply_message = process_message(user_message)
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_message))
 
 @handler.add(MemberJoinedEvent)
 def welcome(event):
