@@ -28,16 +28,7 @@ def process_message(text):
         return "321"
     else:
         # 在这里可以添加其他处理逻辑，例如调用GPT-3等
-        GPT_answer = GPT_response(text)
-        return GPT_answer
-
-def GPT_response(text):
-    # 接收回應
-    response = openai.Completion.create(model="text-davinci-003", prompt=text, temperature=0.5, max_tokens=500)
-    print(response)
-    # 重組回應
-    answer = response['choices'][0]['text'].replace('。','')
-    return answer
+        return text
 
 # 監聽所有來自 /callback 的 Post Request
 @app.route("/callback", methods=['POST'])
