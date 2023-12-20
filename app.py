@@ -57,7 +57,7 @@ def process_message(text):
 
 def search_google_images(query):
     try:
-        search_results = list(search(query, num=10, stop=10, safe='high'))
+        search_results = list(search(query, num=10, stop=10, safe='off'))
         return search_results
     except Exception as e:
         print(f"Error during Google search: {e}")
