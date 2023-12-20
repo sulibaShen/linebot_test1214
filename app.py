@@ -5,11 +5,13 @@ from linebot import (
 from linebot.exceptions import (
     InvalidSignatureError
 )
+
 from linebot.models import *
+
+from mongodb_function import *
 
 import tempfile, os
 import datetime
-import openai
 import time
 import traceback
 
@@ -19,8 +21,6 @@ static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
 line_bot_api = LineBotApi(os.getenv('CHANNEL_ACCESS_TOKEN'))
 # Channel Secret
 handler = WebhookHandler(os.getenv('CHANNEL_SECRET'))
-# OPENAI API Key初始化設定
-openai.api_key = os.getenv('OPENAI_API_KEY')
 
 def process_message(text):
     # 添加自定义条件，当用户输入"123"时，返回"321"
