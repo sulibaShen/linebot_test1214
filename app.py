@@ -6,7 +6,7 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 
-from google_images_search import GoogleImagesSearch
+from googlesearch import search
 from linebot.models import *
 
 from mongodb_function import *
@@ -56,21 +56,16 @@ def process_message(text):
     return msg
 
 def search_google_images(query):
-    gis = GoogleImagesSearch('your_google_api_key', 'your_google_cx')
-    _search_params = {
-        'q': query,
-        'num': 10,
-        'safe': 'high',
-        'fileType': 'jpg',
-    }
+    try:
+        search_results = list(search(query, num=10, stop=10, safe='high'))
+        return search_results
+    except Exception as e:
+        print(f"Error during Google search: {e}")
+        return []
 
-    gis.search(search_params=_search_params)
-    images = gis.results()
-    return images
-
-def get_random_image_url(images):
-    if images:
-        return random.choice(images).url
+def get_random_image_url(search_results):
+    if search_results:
+        return random.choice(search_results)
     return None
 
 # 監聽所有來自 /callback 的 Post Request
