@@ -59,7 +59,12 @@ def callback():
     signature = request.headers['X-Line-Signature']
     # get request body as text
     body = request.get_data(as_text=True)
-    write_one_data(eval(body.replace('false','False')))
+    try:
+        data = json.loads(body)
+        write_one_data(data)
+    except json.JSONDecodeError as e:
+        print(f"Error decoding JSON: {e}")
+        
     app.logger.info("Request body: " + body)
     # handle webhook body
     try:
