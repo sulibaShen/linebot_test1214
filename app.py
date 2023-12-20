@@ -52,7 +52,7 @@ def process_message(text):
         msg = '已刪除成功'
     else:
         # 在这里可以添加其他处理逻辑，例如调用GPT-3等
-        msg = str('嗚呼呼\n人家聽不懂內owo')
+        msg = str('嗚呼呼\n這種事人家才不懂呢owo')
     return msg
 
 def search_google_images(query):
@@ -97,6 +97,8 @@ def handle_message(event):
         query = '蔚藍檔案 無月'
         images = search_google_images(query)
         image_url = get_random_image_url(images)
+
+        app.logger.info(image_url)
 
         if image_url:
             image_message = ImageSendMessage(
