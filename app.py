@@ -23,12 +23,34 @@ line_bot_api = LineBotApi(os.getenv('CHANNEL_ACCESS_TOKEN'))
 handler = WebhookHandler(os.getenv('CHANNEL_SECRET'))
 
 def process_message(text):
-    # 添加自定义条件，当用户输入"123"时，返回"321"
-    if text == "123":
-        return "321"
+    msg = ''
+    if text == "@讀取":
+        datas = read_many_datas()
+        datas_len = len(datas)
+        msg = f'資料數量，一共{datas_len}條'
+    elif text == '@查詢':
+        datas = col_find('events')
+        msg = str(datas)
+    elif text == '@對話紀錄':
+        datas = read_chat_records()
+        print(type(datas))
+        n = 0
+        text_list = []
+        for data in datas:
+            if '@' in data:
+                continue
+            else:
+                text_list.append(data)
+            n+=1
+        data_text = '\n'.join(text_list)
+        msg = data_text[:5000]
+    elif text == '@刪除':
+        text = delete_all_data()
+        msg = '已刪除成功'
     else:
         # 在这里可以添加其他处理逻辑，例如调用GPT-3等
-        return text
+        msg = str('openAI目前尚未導入，目前以模仿代替\n您說的話是不是\n' + text)
+    return msg
 
 # 監聽所有來自 /callback 的 Post Request
 @app.route("/callback", methods=['POST'])
@@ -37,6 +59,7 @@ def callback():
     signature = request.headers['X-Line-Signature']
     # get request body as text
     body = request.get_data(as_text=True)
+    write_one_data(eval(body.replace('false','False')))
     app.logger.info("Request body: " + body)
     # handle webhook body
     try:
