@@ -14,6 +14,7 @@ import tempfile, os
 import datetime
 import time
 import traceback
+import json
 
 app = Flask(__name__)
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
@@ -64,7 +65,7 @@ def callback():
         write_one_data(data)
     except json.JSONDecodeError as e:
         print(f"Error decoding JSON: {e}")
-        
+
     app.logger.info("Request body: " + body)
     # handle webhook body
     try:
