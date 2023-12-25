@@ -3,3 +3,4 @@ flask
 pymongo==4.6.1
 dnspython==1.16.0
 gunicorn
+openai

@@ -15,6 +15,7 @@ import datetime
 import time
 import traceback
 import json
+import openai
 
 app = Flask(__name__)
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
@@ -22,6 +23,8 @@ static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
 line_bot_api = LineBotApi(os.getenv('CHANNEL_ACCESS_TOKEN'))
 # Channel Secret
 handler = WebhookHandler(os.getenv('CHANNEL_SECRET'))
+# OPENAI API Key初始化設定
+openai.api_key = os.getenv('OPENAI_API_KEY')
 
 def process_message(text):
     msg = ''
@@ -50,8 +53,17 @@ def process_message(text):
         msg = '已刪除成功'
     else:
         # 在这里可以添加其他处理逻辑，例如调用GPT-3等
-        msg = str('openAI目前尚未導入，目前以模仿代替\n您說的話是不是\n' + text)
+        # msg = str('openAI目前尚未導入，目前以模仿代替\n您說的話是不是\n' + text)
+        msg = GPT_response(text)
     return msg
+
+def GPT_response(text):
+    # 接收回應
+    response = openai.Completion.create(model="text-davinci-003", prompt=text, temperature=0.5, max_tokens=500)
+    print(response)
+    # 重組回應
+    answer = response['choices'][0]['text'].replace('。','')
+    return answer
 
 # 監聽所有來自 /callback 的 Post Request
 @app.route("/callback", methods=['POST'])
